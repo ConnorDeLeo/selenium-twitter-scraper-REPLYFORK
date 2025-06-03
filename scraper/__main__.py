@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import pandas as pd
 from twitter_scraper import Twitter_Scraper
 
 try:
@@ -86,7 +87,17 @@ def main():
     replies = scraper.scrape_replies_to_tweet(tweet_url=args.url, scrolls=10)
     for reply in replies:
         print(reply)
+    
+    saveToCSV(replies)
+
     scraper.driver.quit()
+
+def saveToCSV(data):
+    print("saving data to csv file...")
+
+    dataframe = pd.DataFrame(data)
+    dataframe.to_csv('replies.csv', index=False)
+    print("data saved.")
 
 if __name__ == "__main__":
     main()
