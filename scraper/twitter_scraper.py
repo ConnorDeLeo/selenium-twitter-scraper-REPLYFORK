@@ -653,9 +653,37 @@ It may be due to the following:
         for reply in replies:
             try:
                 username = reply.find_element(By.XPATH, './/div[@dir="ltr"]/span').text
+                handle = reply.find_element(By.CLASS_NAME, 'css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3').text
                 timestamp = reply.find_element(By.TAG_NAME, 'time').get_attribute('datetime')
                 content = reply.find_element(By.XPATH, './/div[@data-testid="tweetText"]').text
-                reply_data.append({'username': username, 'timestamp': timestamp, 'content': content})
+                verified = reply.find_element(By.XPATH, './/div[@data-testid="icon-verified"]').get_attribute('aria-label')
+                lower_bar = reply.find_element(By.CLASS_NAME, 'css-175oi2r r-1kbdv8c r-18u37iz r-1wtj0ep r-1ye8kvj r-1s2bzr4').get_attribute('aria-label')
+                
+                lower_bar_array = []
+                current_num = ""
+
+                for char in lower_bar:
+                    if char.isdigit():
+                        current_num += char
+                    elif current_number:
+                        lower_bar_array.append(int(current_number))
+                        current_number = ""
+                if current_number:
+                    lower_bar_array.append(int(current_number))
+                    return integers
+
+                reply_data.append({
+                    'username': username, 
+                    'handle': handle, 'verified': verified, 
+                    'timestamp': timestamp, 
+                    'content': content, 
+                    'replies': lower_bar_array[0], 
+                    'reposts': lower_bar_array[1], 
+                    'likes': lower_bar_array[2], 
+                    'bookmarks': lower_bar_array[3], 
+                    'views': lower_bar_array[4]
+                })
+                
             except Exception as e:
                 print(f"Error extracting reply: {e}")
         return reply_data
