@@ -28,6 +28,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
+from selenium.webdriver.common.by import By
+
 TWITTER_LOGIN_URL = "https://twitter.com/i/flow/login"
 
 
@@ -38,6 +40,7 @@ class Twitter_Scraper:
         username,
         password,
         headlessState,
+        tweet_url,
         max_tweets=50,
         scrape_username=None,
         scrape_hashtag=None,
@@ -633,3 +636,27 @@ It may be due to the following:
 
     def get_tweets(self):
         return self.data
+    
+    def scrape_replies_to_tweet(self, tweet_url, scrolls):
+        self.driver.get(tweet_url)
+        sleep(5)
+
+        scroll = 0
+        while scroll < scrolls:
+            scroll += 1
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            sleep(2)
+
+        replies = self.driver.find_elements(By.XPATH, '//article[@data-testid="tweet"]')
+        reply_data = []
+        
+        for reply in replies:
+            try:
+                username = reply.find_element(By.XPATH, './/div[@dir="ltr"]/span').text
+                timestamp = reply.find_element(By.TAG_NAME, 'time').get_attribute('datetime')
+                content = reply.find_element(By.XPATH, './/div[@data-testid="tweetText"]').text
+                reply_data.append({'username': username, 'timestamp': timestamp, 'content': content})
+            except Exception as e:
+                print(f"Error extracting reply: {e}")
+        return reply_data
+
